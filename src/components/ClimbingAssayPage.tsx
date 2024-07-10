@@ -70,7 +70,7 @@ function ClimbingAssayPage() {
       <div className="row">
         <div className="col-4"></div>
         <div className="col-8">
-          <Button fullWidth `href="labelImages" onClick={()=>sessionStorage.setItem('flyImages', JSON.stringify(images))}>
+          <Button fullWidth href="labelImages" onClick={()=>sessionStorage.setItem('flyImages', JSON.stringify(images))}>
             Submit
           </Button>
         </div>
