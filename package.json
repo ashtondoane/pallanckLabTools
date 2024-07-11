@@ -1,11 +1,11 @@
 {
-  "hompage":"https://ashtondoane.github.io/pallanckLabTools",
+  "hompage": "https://ashtondoane.github.io/pallanckLabTools",
   "name": "react-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predeploy":"npm run build",
+    "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
     "dev": "vite",
     "build": "tsc && vite build",
@@ -17,6 +17,8 @@
     "bootstrap": "^5.3.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-easy-crop": "^5.0.7",
+    "react-image-crop": "^11.0.5",
     "sass": "^1.77.6"
   },
   "devDependencies": {

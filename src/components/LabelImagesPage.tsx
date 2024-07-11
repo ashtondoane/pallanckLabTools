@@ -144,7 +144,16 @@ function LabelImagesPage() {
             ) : (
               <Button href="cropImages" onClick={()=>sessionStorage.setItem("flySets",JSON.stringify(flySets))}>Continue to cropping</Button>
             )} */}
-            <Button href="cropImages" onClick={()=>sessionStorage.setItem("flySets",JSON.stringify(flySets))}>Continue to cropping</Button>
+            <Button href="cropImages" onClick={()=>{
+                let temp:string[] = []
+                for(let i = 1; i<=6;i++){
+                    let key:string = "input"+i.toString();
+                    const input = document.getElementById(key);
+                    temp.push(input?.value);
+                }
+                flySets[currentImage].labels = temp;
+                sessionStorage.setItem("flySets",JSON.stringify(flySets));
+                }}>Continue to cropping</Button>
           </center>
         </div>
       </div>
