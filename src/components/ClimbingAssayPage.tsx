@@ -1,10 +1,40 @@
 import * as React from "react";
 import FileUpload from "./FileUpload";
 import Button from "@cloudscape-design/components/button";
+import {FlySet} from "../App";
 
 function ClimbingAssayPage() {
   const [images, setImages] = React.useState<string[]>([]);
-  
+  const [flySets, setFlySets] = React.useState({});
+
+  function organizeToSets(images:string[]){
+    //currently only allows 6 images due to session storage constraint --> fix in future with DB
+    if(images.length != 6){
+      alert("Incorrect data formatting found.");
+    }
+
+    let currSet:FlySet = {};
+    let result:FlySet[] = [];
+    for(var i=0;i<images.length;i++){
+      if(i%6==0){
+        if(i != 0){
+          result.push(currSet);
+        }
+        currSet = {labeledImage:images[i]};
+      }
+      else{
+        if(currSet.dataImages == null){
+          currSet.dataImages = [images[i]];
+        }else{
+          currSet.dataImages.push(images[i]);
+        }
+      }
+    }
+    result.push(currSet);
+    sessionStorage.setItem("flySets", JSON.stringify(result));
+    setFlySets(result);
+  }
+
   function readFileAsURL(file:File){
     return new Promise<any>(function(resolve,reject){
         let fr = new FileReader();
@@ -28,8 +58,6 @@ function ClimbingAssayPage() {
         convertedData.push(fileContent);
       });
     }
-    console.log(convertedData);
-    console.log(JSON.stringify(convertedData));
     setImages(convertedData);
   }
   
@@ -64,13 +92,13 @@ function ClimbingAssayPage() {
           <FileUpload onUpload={onUpload}/>
         </div>
         <div className="col-8 border rounded align-content-center overflow-auto" style={{maxHeight:"30vh"}}>
-          <center>{images.length>0?images.map((img)=><img key={img[0]} src={img} style={{width:"8vw",height:"8vw  ",borderRadius:"20px",padding:"10px"}}/>):"No preview available."}</center>
+          <center>{images.length>0?images.map((img)=><img key={img[0]} src={img} style={{width:"8vw",height:"8vw  ",borderRadius:"20px",padding:"5px"}}/>):"No preview available."}</center>
         </div>
       </div>
       <div className="row">
         <div className="col-4"></div>
         <div className="col-8">
-          <Button fullWidth href="labelImages" onClick={()=>sessionStorage.setItem('flyImages', JSON.stringify(images))}>
+          <Button fullWidth href="labelImages" onClick={()=>{organizeToSets(images)}}>
             Submit
           </Button>
         </div>
@@ -78,4 +106,5 @@ function ClimbingAssayPage() {
     </div>
   );
 }
+
 export default ClimbingAssayPage;
