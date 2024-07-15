@@ -4,10 +4,9 @@ import { DataContext } from "../App";
 
 function GradingPage(){
     const [flySets, setFlySets] = React.useContext(DataContext);
-    console.log(flySets);
     return(
         <div>
-            {flySets.length}
+            
         </div>
     )
 }

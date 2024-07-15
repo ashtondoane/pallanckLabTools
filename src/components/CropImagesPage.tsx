@@ -46,7 +46,6 @@ function CropImagesPage() {
       flySets[currentSet].croppedImages = [null,null,null,null,null];
     }
     flySets[currentSet].croppedImages[currentImage] = img;
-    console.log(flySets);
     setFlySets(temp);
     const newImg = currentImage+1;
     if(newImg%5==0){
@@ -75,8 +74,8 @@ function CropImagesPage() {
         <h3>Crop Images</h3>
         <div className="col-8">
           <ProgressBar
-            value = {(5*currentSet+currentImage+1)/(flySets.length*5)}
-            additionalInfo={(flySets.length - currentImage).toString() + " image(s) left"}
+            value = {(5*currentSet+currentImage)/(flySets.length*5)*100}
+            additionalInfo={(flySets.length*5 - (5*currentSet+currentImage)).toString() + " image(s) left"}
           />
         </div>
         <div className="col-4">
