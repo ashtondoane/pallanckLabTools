@@ -15,6 +15,15 @@ interface FlySet{
   dataImages?:string[]
 }
 
+interface FlyData{
+  numFlys?:number,
+  heights?:number[]
+  averageHeight?:number
+  stdDev?:number
+  max?:number,
+  min?:number
+}
+
 function App() {
   //Store data for the images that have been uploaded and their analysis.
   const [flyImages, setFlyImages] = React.useState([]);
@@ -65,4 +74,5 @@ function App() {
 }
 
 export type {FlySet as FlySet};
+export type {FlyData as FlyData};
 export default App;

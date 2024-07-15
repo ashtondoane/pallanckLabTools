@@ -34,7 +34,13 @@ function CropImagesPage() {
         </div>
         <div className="col-4">
           <center>
-            {currentImage==flySets.length?<Button href="" onClick={()=>{}}>Continue</Button>:<Button disabled>Continue</Button>}
+            {currentImage == flySets.length ? (
+              <Button fullWidth href="" onClick={() => {}}>
+                Continue
+              </Button>
+            ) : (
+              <Button fullWidth disabled>Continue</Button>
+            )}
           </center>
         </div>
       </div>
