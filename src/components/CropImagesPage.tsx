@@ -57,7 +57,7 @@ function CropImagesPage() {
     resetCropper();
   }
 
-  //Remove some data if necessary? Store cropped images only...
+  // Crop each image into 6 individual ones and pass along this data into flySets.individualVials
   // const onContinueClick = ()=>{
   //   for(var set of flySets){
   //     set.dataImages = null;

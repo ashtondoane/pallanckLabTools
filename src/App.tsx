@@ -13,7 +13,8 @@ interface FlySet{
   labels?:string[],
   labeledImage?:string,
   dataImages?:string[],
-  croppedImages?:string[]
+  croppedImages?:string[],
+  individualVials?:string[][] //Index of data images corresponds to list of 6 vials individually cut.
 }
 
 interface FlyData{
