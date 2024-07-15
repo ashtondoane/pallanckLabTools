@@ -2,14 +2,18 @@ import * as React from "react";
 import FileUpload from "./FileUpload";
 import Button from "@cloudscape-design/components/button";
 import {FlySet} from "../App";
+import { Link } from "react-router-dom";
+import { DataContext } from "../App";
 
-function ClimbingAssayPage() {
+function ClimbingAssayPage(){
   const [images, setImages] = React.useState<string[]>([]);
-  const [flySets, setFlySets] = React.useState({});
+  const [flySets, setFlySets] = React.useContext(DataContext);
 
   function organizeToSets(images:string[]){
-    //currently only allows 6 images due to session storage constraint --> fix in future with DB
-    if(images.length != 6){
+    if(images.length == 0){
+      alert("No images found. Please try again.")
+    }
+    if(images.length%6 != 0){
       alert("Incorrect data formatting found.");
     }
 
@@ -31,10 +35,10 @@ function ClimbingAssayPage() {
       }
     }
     result.push(currSet);
-    sessionStorage.setItem("flySets", JSON.stringify(result));
     setFlySets(result);
   }
 
+  //Takes in files and converts to URL image format.
   function readFileAsURL(file:File){
     return new Promise<any>(function(resolve,reject){
         let fr = new FileReader();
@@ -98,9 +102,10 @@ function ClimbingAssayPage() {
       <div className="row">
         <div className="col-4"></div>
         <div className="col-8">
-          <Button fullWidth href="labelImages" onClick={()=>{organizeToSets(images)}}>
+        <Link to="../labelImages">
+          <Button fullWidth onClick={()=>{organizeToSets(images);}}>
             Submit
-          </Button>
+          </Button></Link>
         </div>
       </div>
     </div>

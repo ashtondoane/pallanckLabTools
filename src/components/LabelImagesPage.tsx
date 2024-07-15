@@ -2,21 +2,61 @@ import * as React from "react";
 import ProgressBar from "@cloudscape-design/components/progress-bar";
 import { Button } from "@cloudscape-design/components";
 import { FlySet } from "../App";
+import { Link } from "react-router-dom";
+import { DataContext } from "../App";
 
 function LabelImagesPage() {
   const [currentImage, setCurrentImage] = React.useState(0);
-  const [flySets, setFlySets] = React.useState<FlySet[]>([]);
-
-  React.useEffect(() => {
-    const storedData = sessionStorage.getItem("flySets");
-    if (storedData) {
-      setFlySets(JSON.parse(storedData));
-    }
-  }, []);
+  const [flySets, setFlySets] = React.useContext(DataContext);
 
   if (flySets.length < 1) {
     return <div>No files found. Please return to the prior step.</div>;
   }
+
+  const onBackClick = () => {
+    let newImg = currentImage - 1;
+    let temp: string[] = [];
+    for (let i = 1; i <= 6; i++) {
+      let key: string = "input" + i.toString();
+      const input = document.getElementById(key) as HTMLInputElement;
+      temp.push(input?.value);
+      input.value = flySets[newImg].labels[i - 1];
+    }
+    if (currentImage != flySets.length) {
+      flySets[currentImage].labels = temp;
+    }
+    setCurrentImage(newImg);
+  };
+
+  const onNextClick = () => {
+    let newImg = currentImage + 1;
+    let temp: string[] = [];
+    for (let i = 1; i <= 6; i++) {
+      let key: string = "input" + i.toString();
+      const input = document.getElementById(key) as HTMLInputElement;
+      temp.push(input.value);
+      if (newImg == flySets.length) {
+        input.value = "------------------------";
+      } else {
+        input.value =
+          flySets && flySets[newImg].labels
+            ? flySets[newImg].labels[i - 1]
+            : input.defaultValue;
+      }
+    }
+    flySets[currentImage].labels = temp;
+    setCurrentImage(newImg);
+  };
+
+  const onContinueClick = () => {
+    let temp: string[] = [];
+    for (let i = 1; i <= 6; i++) {
+      let key: string = "input" + i.toString();
+      const input = document.getElementById(key) as HTMLInputElement;
+      temp.push(input?.value);
+    }
+    flySets[currentImage].labels = temp;
+  };
 
   return (
     <div className="container-fluid">
@@ -32,82 +72,67 @@ function LabelImagesPage() {
               id="input1"
               defaultValue="Set 1"
               style={{ margin: "10px" }}
-              readOnly={currentImage==flySets.length?true:false}
+              readOnly={currentImage == flySets.length ? true : false}
             />
             <input
               id="input2"
               defaultValue="Set 2"
               style={{ margin: "10px" }}
-              readOnly={currentImage==flySets.length?true:false}
+              readOnly={currentImage == flySets.length ? true : false}
             />
             <input
               id="input3"
               defaultValue="Set 3"
               style={{ margin: "10px" }}
-              readOnly={currentImage==flySets.length?true:false}
+              readOnly={currentImage == flySets.length ? true : false}
             />
             <input
               id="input4"
               defaultValue="Set 4"
               style={{ margin: "10px" }}
-              readOnly={currentImage==flySets.length?true:false}
+              readOnly={currentImage == flySets.length ? true : false}
             />
             <input
               id="input5"
               defaultValue="Set 5"
               style={{ margin: "10px" }}
-              readOnly={currentImage==flySets.length?true:false}
+              readOnly={currentImage == flySets.length ? true : false}
             />
             <input
               id="input6"
               defaultValue="Set 6"
               style={{ margin: "10px" }}
-              readOnly={currentImage==flySets.length?true:false}
+              readOnly={currentImage == flySets.length ? true : false}
             />
-            {/* {currentImage == 0 ? (
+            {currentImage == 0 ? (
               <Button disabled>Back</Button>
             ) : (
-              <Button onClick={() => {
-                let newImg = currentImage-1;
-                let temp:string[] = []
-                for(let i = 1; i<=6;i++){
-                    let key:string = "input"+i.toString();
-                    const input = document.getElementById(key);
-                    temp.push(input?.value);
-                    input.value = flySets[newImg].labels[i-1];
-                }
-                if(currentImage!=flySets.length){
-                    flySets[currentImage].labels = temp;
-                }
-                setCurrentImage(newImg);
-              }}>
+              <Button
+                onClick={() => {
+                  onBackClick();
+                }}
+              >
                 Back
               </Button>
             )}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             {currentImage >= flySets.length ? (
-              <Button disabled>
-                Next
-              </Button>
+              <Button disabled>Next</Button>
             ) : (
-              <Button onClick={() => {
-                let newImg = currentImage + 1;
-                let temp:string[] = []
-                for(let i = 1; i<=6;i++){
-                    let key:string = "input"+i.toString();
-                    const input = document.getElementById(key);
-                    temp.push(input?.value);
-                    input.value = newImg==flySets.length?"------------------------":input.defaultValue;
-                }
-                flySets[currentImage].labels = temp;
-                setCurrentImage(newImg);    
-                }}>
+              <Button
+                onClick={() => {
+                  onNextClick();
+                }}
+              >
                 Next
               </Button>
-            )} */}
+            )}
           </center>
         </div>
-        <div className="col-9 border">
+        <div
+          className="col-9 border align-content-center"
+          style={{ height: "60vh" }}
+        >
           <center>
             {currentImage < flySets.length ? (
               <img
@@ -117,13 +142,12 @@ function LabelImagesPage() {
                   height: "100%",
                   width: "auto",
                   maxHeight: "60vh",
+                  maxWidth: "100%",
                   padding: "5px",
                 }}
               />
             ) : (
-              <div style={{minHeight:"60vh"}}>
-                
-              </div>
+              <div style={{ minHeight: "60vh" }}>DONE</div>
             )}
           </center>
         </div>
@@ -139,21 +163,19 @@ function LabelImagesPage() {
         </div>
         <div className="col-4 align-content-center">
           <center>
-            {/* {currentImage < flySets.length ? (
+            {currentImage < flySets.length ? (
               <Button disabled>Continue to cropping</Button>
             ) : (
-              <Button href="cropImages" onClick={()=>sessionStorage.setItem("flySets",JSON.stringify(flySets))}>Continue to cropping</Button>
-            )} */}
-            <Button href="cropImages" onClick={()=>{
-                let temp:string[] = []
-                for(let i = 1; i<=6;i++){
-                    let key:string = "input"+i.toString();
-                    const input = document.getElementById(key);
-                    temp.push(input?.value);
-                }
-                flySets[currentImage].labels = temp;
-                sessionStorage.setItem("flySets",JSON.stringify(flySets));
-                }}>Continue to cropping</Button>
+              <Link to="../cropImages">
+                <Button
+                  onClick={() => {
+                    onContinueClick();
+                  }}
+                >
+                  Continue to cropping
+                </Button>
+              </Link>
+            )}
           </center>
         </div>
       </div>
