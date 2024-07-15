@@ -15,13 +15,16 @@
     "@cloudscape-design/components": "^3.0.677",
     "@cloudscape-design/global-styles": "^1.0.31",
     "bootstrap": "^5.3.3",
+    "pyodide": "^0.26.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-draggable": "^4.4.6",
     "react-easy-crop": "^5.0.7",
     "react-image-crop": "^11.0.5",
     "sass": "^1.77.6"
   },
   "devDependencies": {
+    "@types/node": "^20.14.10",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
     "@vitejs/plugin-react": "^3.1.0",

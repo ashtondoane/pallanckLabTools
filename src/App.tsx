@@ -24,6 +24,7 @@ interface FlyData{
   max?:number,
   min?:number
 }
+
 export const DataContext = React.createContext<any[]>([]);
 
 function App() {
