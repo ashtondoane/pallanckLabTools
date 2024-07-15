@@ -12,7 +12,8 @@ import GradingPage from "./components/GradingPage";
 interface FlySet{
   labels?:string[],
   labeledImage?:string,
-  dataImages?:string[]
+  dataImages?:string[],
+  croppedImages?:string[]
 }
 
 interface FlyData{

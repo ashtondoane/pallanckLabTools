@@ -5,9 +5,11 @@ import { DataContext } from "../App";
 import Cropper from "react-easy-crop";
 import Slider from "@cloudscape-design/components/slider";
 import { Link } from "react-router-dom";
+import getCroppedImg from "./CropImages";
 
 function CropImagesPage() {
   const [flySets, setFlySets] = React.useContext(DataContext);
+  const [croppedArea, setCroppedArea] = React.useState(null);
   const [currentSet, setCurrentSet] = React.useState(0);
   const [currentImage, setCurrentImage] = React.useState(0);
   const [crop, setCrop] = React.useState({ x: 0, y: 0 });
@@ -18,17 +20,34 @@ function CropImagesPage() {
   const [width, setWidth] = React.useState(600);
   const [height, setHeight] = React.useState(300);
 
+  const onCropComplete = (croppedAreaPercentage:any, croppedAreaPixels:any) => {
+		setCroppedArea(croppedAreaPixels);
+	};
+
+  const resetCropper = ()=>{
+    setRotation(0);
+  }
+
   const onBackClick = ()=>{
     const newImg = currentImage-1;
-    if(newImg%5==0){
+    if(newImg<0){
       setCurrentSet(currentSet-1);
       setCurrentImage(4);
     }else{
       setCurrentImage(newImg);
     }
+    resetCropper();
   }
 
-  const onCropClick = ()=>{
+  const onCropClick = async ()=>{
+    const img = await getCroppedImg(flySets[currentSet].dataImages[currentImage], croppedArea);
+    const temp = flySets;
+    if(!flySets[currentSet].croppedImages){
+      flySets[currentSet].croppedImages = [null,null,null,null,null];
+    }
+    flySets[currentSet].croppedImages[currentImage] = img;
+    console.log(flySets);
+    setFlySets(temp);
     const newImg = currentImage+1;
     if(newImg%5==0){
       setCurrentSet(currentSet+1);
@@ -36,7 +55,15 @@ function CropImagesPage() {
     }else{
       setCurrentImage(newImg);
     }
+    resetCropper();
   }
+
+  //Remove some data if necessary? Store cropped images only...
+  // const onContinueClick = ()=>{
+  //   for(var set of flySets){
+  //     set.dataImages = null;
+  //   }
+  // }
 
   if(!flySets){
     return (<div>Cannot find data...</div>)
@@ -48,7 +75,8 @@ function CropImagesPage() {
         <h3>Crop Images</h3>
         <div className="col-8">
           <ProgressBar
-            additionalInfo={(6 - currentImage).toString() + " image(s) left"}
+            value = {(5*currentSet+currentImage+1)/(flySets.length*5)}
+            additionalInfo={(flySets.length - currentImage).toString() + " image(s) left"}
           />
         </div>
         <div className="col-4">
@@ -127,6 +155,7 @@ function CropImagesPage() {
               showGrid={true}
               cropSize={{ width: width, height: height }}
               onCropChange={setCrop}
+              onCropComplete={onCropComplete}
               onZoomChange={setZoom}
               onRotationChange={setRotation}
             />

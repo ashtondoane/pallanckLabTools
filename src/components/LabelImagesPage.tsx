@@ -49,13 +49,7 @@ function LabelImagesPage() {
   };
 
   const onContinueClick = () => {
-    let temp: string[] = [];
-    for (let i = 1; i <= 6; i++) {
-      let key: string = "input" + i.toString();
-      const input = document.getElementById(key) as HTMLInputElement;
-      temp.push(input?.value);
-    }
-    flySets[currentImage].labels = temp;
+    
   };
 
   return (
