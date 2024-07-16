@@ -1,14 +1,15 @@
 import * as React from "react";
-import { FlySet } from "../App";
+import { FlySet, VialDataContext } from "../App";
 import { Button, ProgressBar } from "@cloudscape-design/components";
-import { DataContext } from "../App";
+import { FlySetContext, VialData } from "../App";
 import Cropper from "react-easy-crop";
 import Slider from "@cloudscape-design/components/slider";
 import { Link } from "react-router-dom";
-import getCroppedImg from "./CropImages";
+import getCroppedImg from "../dataTools/CropImages";
 
 function CropImagesPage() {
-  const [flySets, setFlySets] = React.useContext(DataContext);
+  const [flySets, setFlySets] = React.useContext(FlySetContext);
+  const [vialData, setVialData] = React.useContext(VialDataContext);
   const [croppedArea, setCroppedArea] = React.useState(null);
   const [currentSet, setCurrentSet] = React.useState(0);
   const [currentImage, setCurrentImage] = React.useState(0);
@@ -20,52 +21,72 @@ function CropImagesPage() {
   const [width, setWidth] = React.useState(600);
   const [height, setHeight] = React.useState(300);
 
-  const onCropComplete = (croppedAreaPercentage:any, croppedAreaPixels:any) => {
-		setCroppedArea(croppedAreaPixels);
-	};
+  const onCropComplete = (
+    croppedAreaPercentage: any,
+    croppedAreaPixels: any
+  ) => {
+    setCroppedArea(croppedAreaPixels);
+  };
 
-  const resetCropper = ()=>{
+  const resetCropper = () => {
     setRotation(0);
-  }
+    setRotationSliderVal(0);
+  };
 
-  const onBackClick = ()=>{
-    const newImg = currentImage-1;
-    if(newImg<0){
-      setCurrentSet(currentSet-1);
+  const onBackClick = () => {
+    const newImg = currentImage - 1;
+    if (newImg < 0) {
+      setCurrentSet(currentSet - 1);
       setCurrentImage(4);
-    }else{
+    } else {
       setCurrentImage(newImg);
     }
     resetCropper();
-  }
+  };
 
-  const onCropClick = async ()=>{
-    const img = await getCroppedImg(flySets[currentSet].dataImages[currentImage], croppedArea);
+  const onCropClick = async () => {
+    const img = await getCroppedImg(
+      flySets[currentSet].dataImages[currentImage],
+      croppedArea,
+      rotation
+    );
     const temp = flySets;
-    if(!flySets[currentSet].croppedImages){
-      flySets[currentSet].croppedImages = [null,null,null,null,null];
+    if (!flySets[currentSet].croppedImages) {
+      flySets[currentSet].croppedImages = [null, null, null, null, null];
     }
     flySets[currentSet].croppedImages[currentImage] = img;
     setFlySets(temp);
-    const newImg = currentImage+1;
-    if(newImg%5==0){
-      setCurrentSet(currentSet+1);
+    const newImg = currentImage + 1;
+    if (newImg % 5 == 0) {
+      setCurrentSet(currentSet + 1);
       setCurrentImage(0);
-    }else{
+    } else {
       setCurrentImage(newImg);
     }
     resetCropper();
-  }
+  };
 
-  // Crop each image into 6 individual ones and pass along this data into flySets.individualVials
-  // const onContinueClick = ()=>{
-  //   for(var set of flySets){
-  //     set.dataImages = null;
-  //   }
-  // }
+  // Crop each image into six, make VialData from it, and set context.
+  const onContinueClick = async () => {
+    const temp = JSON.parse(JSON.stringify(flySets));
+    const result: VialData[] = [];
+    for (let set of temp) {
+      for (let i = 0; i < set.croppedImages.length; i++) {
+        for (let j = 0; j < 6; j++) {
+          //croppedImg called with customCrop set to true (this splits into 6 automatically, j indicates which sixth)
+          result.push({
+            label:set.labels[j],
+            n:1,
+            src: await getCroppedImg(set.croppedImages[i], {}, 0, true, j),
+          });
+        }
+      }
+    }
+    setVialData(result);
+  };
 
-  if(!flySets){
-    return (<div>Cannot find data...</div>)
+  if (!flySets) {
+    return <div>Cannot find data...</div>;
   }
 
   return (
@@ -74,19 +95,32 @@ function CropImagesPage() {
         <h3>Crop Images</h3>
         <div className="col-8">
           <ProgressBar
-            value = {(5*currentSet+currentImage)/(flySets.length*5)*100}
-            additionalInfo={(flySets.length*5 - (5*currentSet+currentImage)).toString() + " image(s) left"}
+            value={
+              ((5 * currentSet + currentImage) / (flySets.length * 5)) * 100
+            }
+            additionalInfo={
+              (
+                flySets.length * 5 -
+                (5 * currentSet + currentImage)
+              ).toString() + " image(s) left"
+            }
           />
         </div>
         <div className="col-4">
           <center>
             {currentSet == flySets.length ? (
-              <Link to="../gradeImages"><Button fullWidth>
-                Continue
-              </Button>
+              <Link
+                to="../gradeImages"
+                onClick={() => {
+                  onContinueClick();
+                }}
+              >
+                <Button fullWidth>Continue</Button>
               </Link>
             ) : (
-              <Button fullWidth disabled>Continue</Button>
+              <Button fullWidth disabled>
+                Continue
+              </Button>
             )}
           </center>
         </div>
@@ -127,41 +161,67 @@ function CropImagesPage() {
             <br></br>
             <br></br>
             {/* Makes the current image fill the whole space to get a better view*/}
-            {currentSet==0&&currentImage==0?<Button disabled>Back</Button>:<Button onClick={()=>{onBackClick()}}>Back</Button>}
+            {currentSet == 0 && currentImage == 0 ? (
+              <Button disabled>Back</Button>
+            ) : (
+              <Button
+                onClick={() => {
+                  onBackClick();
+                }}
+              >
+                Back
+              </Button>
+            )}
             &nbsp;&nbsp;&nbsp;
-            {currentSet==flySets.length?<Button disabled>Crop</Button>:<Button onClick={()=>{onCropClick()}}>Crop</Button>}
+            {currentSet == flySets.length ? (
+              <Button disabled>Crop</Button>
+            ) : (
+              <Button
+                onClick={() => {
+                  onCropClick();
+                }}
+              >
+                Crop
+              </Button>
+            )}
           </center>
         </div>
         <div className="col-9 border rounded">
-        {currentSet==flySets.length?<center>DONE</center>:<div
-            className="crop-container"
-            style={{
-              position: "relative",
-              width: "100%",
-              height: "60vh",
-              background: "#333",
-            }}
-          >
-            <Cropper
-              key={key}
-              image={flySets[currentSet].dataImages[currentImage]}
-              crop={crop}
-              rotation={rotation}
-              zoom={zoom}
-              zoomSpeed={2}
-              maxZoom={3}
-              zoomWithScroll={true}
-              showGrid={true}
-              cropSize={{ width: width, height: height }}
-              onCropChange={setCrop}
-              onCropComplete={onCropComplete}
-              onZoomChange={setZoom}
-              onRotationChange={setRotation}
-            />
-          </div>}
+          {currentSet == flySets.length ? (
+            <center>DONE</center>
+          ) : (
+            <div
+              className="crop-container"
+              style={{
+                position: "relative",
+                width: "100%",
+                height: "60vh",
+                background: "#333",
+              }}
+            >
+              <Cropper
+                key={key}
+                image={flySets[currentSet].dataImages[currentImage]}
+                crop={crop}
+                rotation={rotation}
+                zoom={zoom}
+                zoomSpeed={2}
+                maxZoom={3}
+                zoomWithScroll={true}
+                showGrid={true}
+                cropSize={{ width: width, height: height }}
+                onCropChange={setCrop}
+                onCropComplete={onCropComplete}
+                onZoomChange={setZoom}
+                onRotationChange={setRotation}
+              />
+            </div>
+          )}
         </div>
         <div className="row fw-light" style={{ paddingTop: "20px" }}>
-          <u><h6>Guidelines:</h6></u>
+          <u>
+            <h6>Guidelines:</h6>
+          </u>
           <text>
             Please ensure that the top/bottom are aligned with the{" "}
             <u>inside edges</u> of the metal plate, and that the sides are

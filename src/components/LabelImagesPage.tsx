@@ -3,11 +3,11 @@ import ProgressBar from "@cloudscape-design/components/progress-bar";
 import { Button } from "@cloudscape-design/components";
 import { FlySet } from "../App";
 import { Link } from "react-router-dom";
-import { DataContext } from "../App";
+import { FlySetContext } from "../App";
 
 function LabelImagesPage() {
   const [currentImage, setCurrentImage] = React.useState(0);
-  const [flySets, setFlySets] = React.useContext(DataContext);
+  const [flySets, setFlySets] = React.useContext(FlySetContext);
 
   if (flySets.length < 1) {
     return <div>No files found. Please return to the prior step.</div>;

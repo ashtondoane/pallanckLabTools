@@ -18,10 +18,17 @@ function getRadianAngle(degreeValue) {
 	return (degreeValue * Math.PI) / 180;
 }
 
-export default async function getCroppedImg(imageSrc, pixelCrop, rotation = 0) {
+export default async function getCroppedImg(imageSrc, pixelCrop, rotation = 0, customSplit=false,i=0) {
 	const image = await createImage(imageSrc);
 	const canvas = document.createElement("canvas");
 	const ctx = canvas.getContext("2d");
+
+	if(customSplit){
+		pixelCrop.width = image.width/6;
+		pixelCrop.height = image.height;
+		pixelCrop.x = image.width/6*i;
+		pixelCrop.y=0;
+	}
 
 	const maxSize = Math.max(image.width, image.height);
 	const safeArea = 2 * ((maxSize / 2) * Math.sqrt(2));

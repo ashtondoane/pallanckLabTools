@@ -3,11 +3,11 @@ import FileUpload from "./FileUpload";
 import Button from "@cloudscape-design/components/button";
 import {FlySet} from "../App";
 import { Link } from "react-router-dom";
-import { DataContext } from "../App";
+import { FlySetContext } from "../App";
 
 function ClimbingAssayPage(){
   const [images, setImages] = React.useState<string[]>([]);
-  const [flySets, setFlySets] = React.useContext(DataContext);
+  const [flySets, setFlySets] = React.useContext(FlySetContext);
 
   function organizeToSets(images:string[]){
     if(images.length == 0){
