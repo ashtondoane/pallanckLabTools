@@ -18,6 +18,7 @@ function GradingPage() {
   const [imgDim, setImgDim] = React.useState([0, 0]);
   const [imgPos, setImgPos] = React.useState([0, 0]);
   const [flyPoints, setFlyPoints] = React.useState<{ x: number; y: number }[]>([]);  //stored as percentages of image height for rendering purposes
+  const [uniqueKey, setUniqueKey] = React.useState(1);
 
   const fetchAPI = async (src:string)=>{
     const response = await axios.get("http://localhost:8080/predictLocations?data="+src);
@@ -74,12 +75,15 @@ function GradingPage() {
     }
     updateData(result);
     setFlyPoints(result);
+    setUniqueKey(uniqueKey*3.14159265);
   };
 
   const onConfirmClick = () => {
     // //TODO:
     let newVial = currentVial + 1;
     setCurrentVial(newVial);
+    setFlyPoints([]);
+    setUniqueKey(uniqueKey*3.14159265);
   };
 
   const onContinueClick = () => {};
@@ -107,6 +111,7 @@ function GradingPage() {
           {flyPoints.length > 0
             ? flyPoints.map((p,i) => (
                 <Draggable
+                  key={i+uniqueKey}
                   positionOffset={{ x: -7.5, y: -7.5 }}
                   defaultPosition={{
                     x: (p.x * imgDim[0]) / 100,
@@ -118,11 +123,11 @@ function GradingPage() {
                     top: 0,
                     bottom: imgDim[1],
                   }}
-                  onStop={(e: DraggableEvent) => {
+                    onStop={(e: DraggableEvent) => {
                     //Log percent of image taken in y direction
                     const copy = JSON.parse(JSON.stringify(flyPoints));
-                    copy[i] = {x:Math.min(imgPos[0]+imgDim[0],(e as MouseEvent).clientX-imgPos[0]), y:Math.min(imgPos[1]+imgDim[1],(e as MouseEvent).clientY-imgPos[1])}
-                    console.log(copy);
+                    copy[i] = {x:Math.max(imgPos[0],Math.min(imgPos[0]+imgDim[0],(e as MouseEvent).clientX-imgPos[0])), y:Math.max(imgPos[1],Math.min(imgPos[1]+imgDim[1],(e as MouseEvent).clientY-imgPos[1]))}
+                    updateData(copy);
                     setFlyPoints(copy);
                   }}
                 >
@@ -133,6 +138,7 @@ function GradingPage() {
                       fontSize: 75,
                       color: "orange",
                       lineHeight: "0px",
+                      cursor:"grab"
                     }}
                   >
                     ·
