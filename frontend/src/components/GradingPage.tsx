@@ -7,7 +7,7 @@ import { DraggableEvent } from "react-draggable";
 import { ProgressBar } from "@cloudscape-design/components";
 import { Component, centerCrop } from "react-image-crop";
 import Spinner from "@cloudscape-design/components/spinner";
-import { getMaxHeight, getMean, getMedian, getMinHeight, getNumFlies } from "../dataTools/DataHandling";
+import { getMaxHeight, getMean, getMedian, getMinHeight, getNumFlies, getStdDev, getYdata } from "../dataTools/DataHandling";
 import { VialDataContext } from "../App";
 import { Link } from "react-router-dom"
 import axios from "axios";
@@ -21,8 +21,19 @@ function GradingPage() {
   const [uniqueKey, setUniqueKey] = React.useState(1);
 
   const fetchAPI = async (src:string)=>{
-    const response = await axios.get("http://localhost:8080/predictLocations?data="+src);
+    const config = {
+      headers: {
+        'Content-Type' : 'application/json',
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
+        method: "POST",
+        body: vialData[currentVial]
+      }
+    };
+    const response = await axios.post("http://localhost:8080/predictLocations", config);
     return response;
+    // const response = await axios.get("http://localhost:8080/predictLocations?src="+src.toString(),config);
+    // return response;
   }
 
   //Resizes the boundaries of our image each time we resize the screen.
@@ -48,17 +59,19 @@ function GradingPage() {
   }, []);
 
   //Updates our stats every for currently showing points.
-  const updateData = (points:{x:number,y:number}[]) => {
-    const copy = JSON.parse(JSON.stringify(vialData));
+  const updateData = async (points:{x:number,y:number}[]) => {
+    const copy = await JSON.parse(JSON.stringify(vialData));
     const temp:VialData = {
       label:copy[currentVial].label,
       n:copy[currentVial].n,
       src:copy[currentVial].src,
       numFlies: getNumFlies(points),
       meanHeight: getMean(points),
-      medianHeight: getMedian(points),
+      // medianHeight: getMedian(points),
       max: getMaxHeight(points),
-      min: getMinHeight(points)
+      min: getMinHeight(points),
+      stdDev: getStdDev(points),
+      rawData: points
     };
     copy[currentVial] = temp; 
     setVialData(copy);
@@ -67,11 +80,14 @@ function GradingPage() {
 
   const onGenerateClick = async () => {
     //Create list of believed points and display them as draggables.
-    const res = await fetchAPI(vialData[currentVial]);
+    const res = await fetchAPI(vialData[currentVial].src);
     const points = await res.data.prediction;
-    const result = [];
+    const result = []; //
     for (let i = 0; i < points.length; i++) {
-      result.push(points[i]);
+      const temp = {x:0,y:0}
+      temp.x = points[i].x*imgDim[0]
+      temp.y = points[i].y*imgDim[1]
+      result.push(temp);
     }
     updateData(result);
     setFlyPoints(result);
@@ -107,6 +123,7 @@ function GradingPage() {
           style={{
             height: "70vh",
           }}
+          key={flyPoints.toString()}
         >
           {flyPoints.length > 0
             ? flyPoints.map((p,i) => (
@@ -114,8 +131,8 @@ function GradingPage() {
                   key={i+uniqueKey}
                   positionOffset={{ x: -7.5, y: -7.5 }}
                   defaultPosition={{
-                    x: (p.x * imgDim[0]) / 100,
-                    y: (p.y * imgDim[1]) / 100,
+                    x: p.x,
+                    y: p.y,
                   }}
                   bounds={{
                     left: 0,
@@ -123,12 +140,21 @@ function GradingPage() {
                     top: 0,
                     bottom: imgDim[1],
                   }}
+                  onMouseDown={async (e:MouseEvent)=>{
+                    if(e.shiftKey){
+                      const copy = await JSON.parse(JSON.stringify(flyPoints));
+                      await copy.splice(flyPoints.indexOf(p),1);
+                      updateData(copy);
+                      setFlyPoints(copy);
+                      setUniqueKey(uniqueKey*1.35)
+                    }
+                  }}
                     onStop={(e: DraggableEvent) => {
-                    //Log percent of image taken in y direction
                     const copy = JSON.parse(JSON.stringify(flyPoints));
-                    copy[i] = {x:Math.max(imgPos[0],Math.min(imgPos[0]+imgDim[0],(e as MouseEvent).clientX-imgPos[0])), y:Math.max(imgPos[1],Math.min(imgPos[1]+imgDim[1],(e as MouseEvent).clientY-imgPos[1]))}
+                    copy[i] = {x:Math.max(0,Math.min(imgDim[0],(e as MouseEvent).clientX-imgPos[0])), y:Math.max(0,Math.min(imgDim[1],(e as MouseEvent).clientY-imgPos[1]))}
                     updateData(copy);
                     setFlyPoints(copy);
+                    setUniqueKey(uniqueKey*1.2);
                   }}
                 >
                   <div
@@ -183,17 +209,6 @@ function GradingPage() {
               }}
             />
           )}
-          {/* <div
-            style={{
-              fontSize: 75,
-              color: "orange",
-              position: "absolute",
-              top: document.getElementById("climbingImage")?.getBoundingClientRect().height,
-              left: document.getElementById("climbingImage")?.getBoundingClientRect().left,
-            }}
-          >
-            .
-          </div> */}
         </div>
         <div className="col-8 border rounded px-3 align-content-center">
           <table className="table table-bordered">
@@ -232,7 +247,7 @@ function GradingPage() {
               </tr>
               <tr>
                 <th scope="row">Min</th>
-                <td>{currentVial < vialData.length &&vialData[currentVial]&&vialData[currentVial].min
+                <td>{currentVial < vialData.length && vialData[currentVial]&&vialData[currentVial].min
                     ? vialData[currentVial].min
                     : 0}</td>
               </tr>
@@ -247,6 +262,16 @@ function GradingPage() {
           <br></br>
           <br></br>
           <center>
+            <Button
+            onClick={()=>{
+              const copy = JSON.parse(JSON.stringify(flyPoints));
+              copy.push({x:0,y:0});
+              updateData(copy);
+              setFlyPoints(copy);
+            }}>
+              Add Point
+            </Button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <Button
               onClick={() => {
                 onGenerateClick();

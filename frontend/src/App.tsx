@@ -29,7 +29,8 @@ interface VialData{
   stdDev?:number
   max?:number,
   min?:number,
-  range?:number
+  range?:number,
+  rawData:{x:number,y:number}[]
 }
 
 export const FlySetContext = React.createContext<any[]>([]);

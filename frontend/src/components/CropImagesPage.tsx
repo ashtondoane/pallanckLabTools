@@ -28,10 +28,6 @@ function CropImagesPage() {
     setCroppedArea(croppedAreaPixels);
   };
 
-  const resetCropper = () => {
-    setRotation(0);
-    setRotationSliderVal(0);
-  };
 
   const onBackClick = () => {
     const newImg = currentImage - 1;
@@ -41,7 +37,6 @@ function CropImagesPage() {
     } else {
       setCurrentImage(newImg);
     }
-    resetCropper();
   };
 
   const onCropClick = async () => {
@@ -63,7 +58,6 @@ function CropImagesPage() {
     } else {
       setCurrentImage(newImg);
     }
-    resetCropper();
   };
 
   // Crop each image into six, make VialData from it, and set context.
@@ -76,8 +70,9 @@ function CropImagesPage() {
           //croppedImg called with customCrop set to true (this splits into 6 automatically, j indicates which sixth)
           result.push({
             label:set.labels[j],
-            n:1,
+            n:i+1,
             src: await getCroppedImg(set.croppedImages[i], {}, 0, true, j),
+            rawData:[]
           });
         }
       }
