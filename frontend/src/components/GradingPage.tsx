@@ -69,7 +69,7 @@ function GradingPage() {
       src:copy[currentVial].src,
       numFlies: getNumFlies(points),
       meanHeight: getMean(points),
-      // medianHeight: getMedian(points),
+      medianHeight: getMedian(points),
       max: getMaxHeight(points),
       min: getMinHeight(points),
       stdDev: getStdDev(points),

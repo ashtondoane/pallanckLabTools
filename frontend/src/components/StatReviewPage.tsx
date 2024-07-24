@@ -40,11 +40,11 @@ function StatReviewPage() {
         }
       }
       temp.meanHeight = DataHandler.getMean(temp.rawData);
+      temp.medianHeight = DataHandler.getMedian(temp.rawData);
       temp.max = DataHandler.getMaxHeight(temp.rawData);
       temp.min = DataHandler.getMinHeight(temp.rawData);
       temp.stdDev = DataHandler.getStdDev(temp.rawData);
       temp.range = temp.max - temp.min;
-      temp.medianHeight = -1;
       result.push(temp);
     }
     return result;

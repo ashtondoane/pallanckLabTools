@@ -26,7 +26,7 @@ export const getMedian = (points:{x:number,y:number}[])=>{
     for(var p of points){
         temp.push(p);
     }
-    temp.sort(({y:a},{y:b})=>a-b);
+    temp.sort((a,b)=>a.y-b.y);
     if(temp.length % 2 == 1){
         return temp[Math.floor(temp.length/2)].y;
     }else{
