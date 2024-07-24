@@ -84,13 +84,12 @@ function GradingPage() {
     //Create list of believed points and display them as draggables.
     const res = await fetchAPI(vialData[currentVial].src);
     const points = await res.data.prediction;
-    console.log(points);
-    const result = []; //
+    const result = [];
     for (let i = 0; i < points.length; i++) {
-      const temp = {x:0,y:0}
-      temp.x = points[i].x*imgDim[0]
-      temp.y = points[i].y*imgDim[1]
-      result.push(temp);
+      const invertedPoint = {x:0,y:0};
+      invertedPoint.x = 1 - points[i].x;
+      invertedPoint.y = 1 - points[i].y
+      result.push(invertedPoint);
     }
     updateData(result);
     setFlyPoints(result);
@@ -134,8 +133,8 @@ function GradingPage() {
                   key={i+uniqueKey}
                   positionOffset={{ x: -7.5, y: -7.5 }}
                   defaultPosition={{
-                    x: p.x,
-                    y: p.y,
+                    x: (1-p.x)*imgDim[0],
+                    y: (1-p.y)*imgDim[1],
                   }}
                   bounds={{
                     left: 0,
@@ -149,15 +148,16 @@ function GradingPage() {
                       await copy.splice(flyPoints.indexOf(p),1);
                       updateData(copy);
                       setFlyPoints(copy);
-                      setUniqueKey(uniqueKey*1.35)
+                      setUniqueKey(uniqueKey*1.012)
                     }
                   }}
                     onStop={(e: DraggableEvent) => {
                     const copy = JSON.parse(JSON.stringify(flyPoints));
-                    copy[i] = {x:Math.max(0,Math.min(imgDim[0],(e as MouseEvent).clientX-imgPos[0])), y:Math.max(0,Math.min(imgDim[1],(e as MouseEvent).clientY-imgPos[1]))}
-                    updateData(copy);
+                    copy[i] = {x:1-(Math.max(0,Math.min(imgDim[0],(e as MouseEvent).clientX-imgPos[0])))/imgDim[0],
+                              y:1-(Math.max(0,Math.min(imgDim[1],(e as MouseEvent).clientY-imgPos[1])))/imgDim[1]};
                     setFlyPoints(copy);
-                    setUniqueKey(uniqueKey*1.2);
+                    updateData(copy);
+                    setUniqueKey(uniqueKey*1.003);
                   }}
                 >
                   <div

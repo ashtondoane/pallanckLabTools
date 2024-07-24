@@ -36,7 +36,6 @@ function StatReviewPage() {
           temp.n += 1;
           temp.numFlies = (temp.numFlies || 0) + (vial.numFlies || 0);
           temp.rawData = [...temp.rawData, ...vial.rawData];
-          // console.log(temp.rawData);
         }
       }
       temp.meanHeight = DataHandler.getMean(temp.rawData);
