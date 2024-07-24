@@ -82,6 +82,7 @@ function GradingPage() {
     //Create list of believed points and display them as draggables.
     const res = await fetchAPI(vialData[currentVial].src);
     const points = await res.data.prediction;
+    console.log(points);
     const result = []; //
     for (let i = 0; i < points.length; i++) {
       const temp = {x:0,y:0}
@@ -91,7 +92,7 @@ function GradingPage() {
     }
     updateData(result);
     setFlyPoints(result);
-    setUniqueKey(uniqueKey*3.14159265);
+    setUniqueKey(uniqueKey*1.014159265);
   };
 
   const onConfirmClick = () => {
@@ -99,7 +100,7 @@ function GradingPage() {
     let newVial = currentVial + 1;
     setCurrentVial(newVial);
     setFlyPoints([]);
-    setUniqueKey(uniqueKey*3.14159265);
+    setUniqueKey(uniqueKey*1.014159265);
   };
 
   const onContinueClick = () => {};

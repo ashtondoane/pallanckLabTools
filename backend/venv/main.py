@@ -19,12 +19,12 @@ def users():
             "prediction": [{"x":0.5,"y":0.5},{"x":0.3,"y":1},{"x":0.2,"y":0.4}]
             # "prediction": getLocsUsingEdges(cvImg)
         })
-    if request.method == 'POST':
+    elif request.method == 'POST':
         req = request.get_json()
         b64 = (req['headers']['body']['src'])
         cvImg = readb64(b64)
         return jsonify({
-            "prediction": checkByRegion(cvImg)
+            "prediction": getLocsUsingEdges(cvImg)
             # "prediction": [{"x":0.5,"y":0.5},{"x":0.3,"y":1},{"x":0.2,"y":0.4}]
         })
     return None
@@ -46,13 +46,19 @@ def writeb64(img):
 
 def getLocsUsingEdges(img):
     edges = cv.Canny(img,100,200)
-    print(edges)
     locs = []
     height = img.shape[0]
     width = img.shape[1]
-    for i in range(height):
-        for j  in range(width):
-            if edges[i,j] == 255:
+    limits = []
+    for i in range(20, height-20):
+        for j  in range(50,width-50):
+            flag = True
+            for p in limits:
+                if i-p[0]<60 and j-p[1]<60:
+                    flag = False
+                    break
+            if flag and edges[i,j] == 255:
+                limits.append([i,j])
                 locs.append({"x":j/width,"y":i/height})
     return locs
 
@@ -63,14 +69,22 @@ def sumSquare(img, x, y, n):
             sum += int(img[i][j])
     return sum
 
-def checkByRegion(img, regionSize=10):
+
+def checkByRegion(img, regionSize=30):
+    """
+    Summary: Checks each region and surrounding region. If the inner region is significantly darker, we expect a fly. This is a
+             heuristic method that could use refinement.
+    """
     height,width = img.shape[0],img.shape[1]
-    averageDarkness = np.sum(img)/(height*width)
-    darkCenters = []
+    darkCenters = [] # X,Y,DIFF triples -> pick only the top n...
     for i in range(100, height-30, regionSize):
         for j in range(100, width-100, regionSize):
-            if sumSquare(img, i, j, regionSize)/(regionSize*regionSize) < averageDarkness*0.5:
-                darkCenters.append({"x":j/width,"y":i/height})
+            outerSum = np.sum(img[i:i+regionSize,j:j+regionSize])
+            innerSum = np.sum(img[i+int(regionSize/4):i+int(3*regionSize/4),j+int(regionSize/4):j+int(3*regionSize/4)])
+            outerAvg = (outerSum-innerSum)/((regionSize**2)-(regionSize/2)**2)
+            innerAvg = innerSum/((regionSize/2)**2) 
+            if innerAvg - outerAvg > 10:
+                darkCenters.append({"x":(j+regionSize/2)/width,"y":(i+regionSize/2)/height,"diff":innerAvg-outerAvg})
     return darkCenters
 
 
@@ -91,6 +105,7 @@ def getDarkCenters(img, innerRadius, outerRadius, threshold):
                 rowLeftSums[row][col] = int(img[row][col])
                 continue
             rowLeftSums[row][col] = int(img[row][col]) + rowLeftSums[row][col-1]
+    #calculate all col sums
     for col in range(len(img[0])):
         for row in range(len(img)):
             if row == 0:
