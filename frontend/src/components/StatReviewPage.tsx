@@ -4,18 +4,24 @@ import { VialData } from "../App";
 import * as DataHandler from "../dataTools/DataHandling";
 import { Spinner } from "@cloudscape-design/components";
 import { Button } from "@cloudscape-design/components";
+import {CSVLink, CSVDownload} from "react-csv";
 
 function StatReviewPage() {
   const [vialData, setVialData] = React.useContext(VialDataContext);
   const [trialData, setTrialData] = React.useState<VialData[]>([]);
+  const [fileName, setFileName] = React.useState("");
+  const [csvData, setCsvData] = React.useState<any[]>([]);
 
   const summarizeSets = (data: VialData[]) => {
     const setNames = [];
+    let tempName = ""
     for (var vial of data) {
-      if (setNames.indexOf(vial.label) == -1) {
+      if (setNames.indexOf(vial.label) == -1 && vial.label.localeCompare("None") != 0) {
+        tempName += "_"+vial.label;
         setNames.push(vial.label);
       }
     }
+    setFileName(tempName);
     const result: VialData[] = [];
     for (var name of setNames) {
       const temp: VialData = {
@@ -30,7 +36,7 @@ function StatReviewPage() {
           temp.n += 1;
           temp.numFlies = (temp.numFlies || 0) + (vial.numFlies || 0);
           temp.rawData = [...temp.rawData, ...vial.rawData];
-          console.log(temp.rawData);
+          // console.log(temp.rawData);
         }
       }
       temp.meanHeight = DataHandler.getMean(temp.rawData);
@@ -44,9 +50,26 @@ function StatReviewPage() {
     return result;
   };
 
+  const generateCSVData = (data:VialData[])=>{
+    const csvTemp:any = [];
+    vialData.sort((a: VialData, b: VialData) => a.label.localeCompare(b.label))
+    for(var vial of vialData){
+      let innerTemp:any[] = [];
+      innerTemp.push(vial.label);
+      innerTemp.push(vial.n);
+      for (var p of vial.rawData){
+        innerTemp.push(p.y);
+      }
+      csvTemp.push(innerTemp);
+    }
+
+    return csvTemp;
+  }
+
   React.useEffect(() => {
-    // console.log(vialData);
+    console.log(vialData);
     setTrialData(summarizeSets(vialData));
+    setCsvData(generateCSVData(vialData));
   }, []);
 
   return (
@@ -94,42 +117,8 @@ function StatReviewPage() {
           )}
         </tbody>
       </table>
-
-      <p className="fw-light">
-        <u>Raw Data:</u>
-      </p>
-      <table className="table">
-        <thead>
-          <tr>
-            <th scope="col" style={{ width: "20%" }}>
-              Set Name
-            </th>
-            <th scope="col" style={{ width: "20%" }}>
-              Trial #
-            </th>
-            <th scope="col">Fly Heights</th>
-          </tr>
-        </thead>
-        <tbody className="fw-light" key={trialData.toString()}>
-          {vialData.length > 0 ? (
-            vialData
-              .sort((a: VialData, b: VialData) =>
-                a.label.localeCompare(b.label)
-              )
-              .map((v: VialData) => (
-                <tr key={v.toString()}>
-                  <td>{v.label}</td>
-                  <td>{v.n}</td>
-                  <td>[{DataHandler.getYdata(v.rawData).toString()}]</td>
-                </tr>
-              ))
-          ) : (
-            <tr>
-              <Spinner></Spinner>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      
+      <CSVLink data={csvData} filename={"full_data_"+fileName} headers={["Set Name", "Trial #", "Fly Heights -->"]}>Download full trial data.</CSVLink>
       </div>
   );
 }

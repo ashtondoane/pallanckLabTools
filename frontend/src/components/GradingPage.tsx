@@ -36,6 +36,8 @@ function GradingPage() {
     // return response;
   }
 
+  
+
   //Resizes the boundaries of our image each time we resize the screen.
   React.useEffect(() => {
     function handleResize() {
@@ -106,7 +108,7 @@ function GradingPage() {
   const onContinueClick = () => {};
 
   if (vialData.length < 1) {
-    return <div>Data not found...</div>;
+    return <div>Data is loading... <Spinner></Spinner></div>;
   }
 
   // console.log(vialData);
@@ -191,6 +193,9 @@ function GradingPage() {
                 maxWidth: "100%",
               }}
               onLoad={() => {
+                if(vialData.length > 0 && vialData[currentVial].label.localeCompare("None") == 0){
+                  setCurrentVial(currentVial+1)
+                }
                 setImgDim([
                   document
                     .getElementById("climbingImage")

@@ -58,8 +58,8 @@ function LabelImagesPage() {
         <h3>Mark the Labeled Images</h3>
       </div>
       <div className="row">
-        <div className="col-3 fw-light">
-          Please label the sets based on the image displayed.
+        <div className="col-3">
+          <text style={{fontSize:10, lineHeight:"1px"}}>Please label the sets based on the image displayed. Input "None" to ignore vials.</text>
           <br></br>
           <center>
             <input
