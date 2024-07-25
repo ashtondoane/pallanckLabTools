@@ -54,8 +54,8 @@ function App() {
           <div className="col" style={{ padding: "20px" }}>
             <BrowserRouter basename="/">
               <Routes>
-                <Route path="" element={<HomePage />}></Route>
-                <Route path="/uploadImages" element={<ClimbingAssayPage/>}></Route>
+                <Route path="/wowzer" element={<HomePage />}></Route>
+                <Route path="" element={<ClimbingAssayPage/>}></Route>
                 <Route path="/labelImages" element={<LabelImagesPage></LabelImagesPage>}></Route>
                 <Route path="/cropImages" element={<CropImagesPage></CropImagesPage>}></Route>
                 <Route path="/gradeImages" element={<GradingPage></GradingPage>}></Route>

@@ -45,7 +45,7 @@ function HomePage(){
         {
           name: "Fly Climbing Assay Automator",
           alt: "uploadImages",
-          description: "This is the first item"
+          description: "Climbing assay tool"
         },
       ]}
       loadingText="Loading resources"
