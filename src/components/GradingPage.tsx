@@ -182,6 +182,15 @@ function GradingPage() {
             <Spinner />
           ) : (
             <img
+              onClick={(e)=> {
+                console.log("click");
+                const copy = JSON.parse(JSON.stringify(flyPoints));
+                copy.push({x:1-(Math.max(0,Math.min(imgDim[0],(e).clientX-imgPos[0])))/imgDim[0],
+                             y:1-(Math.max(0,Math.min(imgDim[1],(e).clientY-imgPos[1])))/imgDim[1]});
+                    setFlyPoints(copy);
+                    updateData(copy);
+                    setUniqueKey(uniqueKey*1.003);
+              }}
               id="climbingImage"
               src={
                 vialData[currentVial].src
@@ -295,7 +304,7 @@ function GradingPage() {
               Confirm
             </Button>
             <br></br><br></br>
-            (*Shift+Click will remove a point.)
+            (Click to add points, Shift+Click to remove.)
           </center>
         </div>
         <div className="row py-3">
