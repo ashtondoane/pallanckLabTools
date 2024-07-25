@@ -7,7 +7,7 @@ import TextFilter from "@cloudscape-design/components/text-filter";
 import Header from "@cloudscape-design/components/header";
 import Pagination from "@cloudscape-design/components/pagination";
 import CollectionPreferences from "@cloudscape-design/components/collection-preferences";
-import { Link } from "@cloudscape-design/components";
+import { Link } from "react-router-dom"
 
 function HomePage(){
   const [
@@ -25,7 +25,7 @@ function HomePage(){
       }}
       cardDefinition={{
         header: item => (
-          <Link href={item.alt} fontSize="heading-m">
+          <Link to="../uploadImages">
             {item.name}
           </Link>
         ),

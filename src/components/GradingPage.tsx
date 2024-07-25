@@ -83,6 +83,7 @@ function GradingPage() {
   const onGenerateClick = async () => {
     //Create list of believed points and display them as draggables.
     const res = await fetchAPI(vialData[currentVial].src);
+    console.log()
     const points = await res.data.prediction;
     const result = [];
     for (let i = 0; i < points.length; i++) {
