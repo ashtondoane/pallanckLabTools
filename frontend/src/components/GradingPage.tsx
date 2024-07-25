@@ -294,7 +294,7 @@ function GradingPage() {
               Confirm
             </Button>
             <br></br><br></br>
-            (*Shift+Click will add a point, while Ctrl+Click will remove a point.)
+            (*Shift+Click will remove a point.)
           </center>
         </div>
         <div className="row py-3">
