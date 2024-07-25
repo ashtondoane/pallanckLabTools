@@ -279,16 +279,6 @@ function GradingPage() {
           <br></br>
           <center>
             <Button
-            onClick={()=>{
-              const copy = JSON.parse(JSON.stringify(flyPoints));
-              copy.push({x:0,y:0});
-              updateData(copy);
-              setFlyPoints(copy);
-            }}>
-              Add Point
-            </Button>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <Button
               onClick={() => {
                 onGenerateClick();
               }}
