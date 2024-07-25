@@ -47,17 +47,20 @@ def writeb64(img):
 def getLocsUsingEdges(img):
     edges = cv.Canny(img,100,200)
     locs = []
-    height = img.shape[0]
-    width = img.shape[1]
+    height,width = img.shape[0],img.shape[1]
+    avgDarkness = np.sum(img)/(height*width)
     limits = []
-    for i in range(20, height-20):
-        for j  in range(50,width-50):
+
+    for i in range(int(height*0.2), height-50,3):
+        for j  in range(int(width*0.2),int(width*0.8),3):
             flag = True
+            locDarkness = np.sum(img[i-5:i+5,j-5:j+5])/100 # brightness of the area beneath and around the edge.
             for p in limits:
                 if i-p[0]<60 and j-p[1]<60:
                     flag = False
                     break
-            if flag and edges[i,j] == 255:
+            if flag and edges[i,j] == 255 and avgDarkness - locDarkness > 25:
+                print(avgDarkness - locDarkness)
                 limits.append([i,j])
                 locs.append({"x":j/width,"y":i/height})
     return locs

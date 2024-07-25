@@ -116,7 +116,7 @@ function GradingPage() {
     <div className="container-fluid px-5">
       <div className="row">
         <h3>Score Images</h3>
-        <p className="fw-light">Don't worry about noting data yet - it will be summed up for you at the end.</p>
+        <p className="fw-light">Don't worry about noting data yet - it will be summed up for you at the end. </p>
       </div>
       <div className="row" style={{ height: "80vh" }}>
         <div
@@ -293,6 +293,8 @@ function GradingPage() {
             >
               Confirm
             </Button>
+            <br></br><br></br>
+            (*Shift+Click will add a point, while Ctrl+Click will remove a point.)
           </center>
         </div>
         <div className="row py-3">
