@@ -118,7 +118,7 @@ function StatReviewPage() {
       </table>
       
       <CSVLink data={csvData} filename={"full_data_"+fileName} headers={["Set Name", "Trial #", "Fly Heights -->"]}>Download full trial data.</CSVLink>
-      Please note that this is a CSV file, not an xslx. Graphs and changes will not be saved unless you change the extension.
+      &nbsp; Please note that this is a CSV file, not an xslx. Graphs and changes will not be saved unless you change the extension.
       </div>
   );
 }
