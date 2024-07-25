@@ -80,7 +80,7 @@ function ClimbingAssayPage(){
           Please structure files as such:
         </p>
           <ol type="1" className="fs-6 fw-light" style={{marginLeft:"30px"}}>
-              <li>Place all files alphabetically in a folder such that we have repeating sets of 1 labeled image followed by 5 unlabeled testing photos.</li>
+              <li>Upload files in sets of six such that we have repeating sets of 1 labeled image followed by 5 images of trial runs.</li>
               <li>As many files can be included as one wishes. However, the current file system is prone to human error in ordering. Please keep this in mind.</li>
           </ol>
         <p className="fs-6 fw-light">
