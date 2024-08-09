@@ -8,13 +8,14 @@ import { FlySetContext } from "../App";
 function ClimbingAssayPage(){
   const [images, setImages] = React.useState<string[]>([]);
   const [flySets, setFlySets] = React.useContext(FlySetContext);
+  const [validity, setValidity] = React.useState(false);
 
   function organizeToSets(images:string[]){
     if(images.length == 0){
       alert("No images found. Please try again.")
     }
-    if(images.length%6 != 0){
-      alert("Incorrect data formatting found.");
+    else if(images.length%6 != 0){
+      alert("Incorrect data formatting found. Please ensure correct types and number of images.");
     }
 
     let currSet:FlySet = {};
@@ -56,6 +57,12 @@ function ClimbingAssayPage(){
 }
 
   const onUpload = async (data:File[]) => {
+    if(data.length == 0 || data.length%6 != 0){
+      setValidity(false);
+    }
+    else{
+      setValidity(true);
+    }
     let convertedData:string[] = []
     for(var image of data){
       await readFileAsURL(image).then((fileContent)=>{
@@ -82,6 +89,7 @@ function ClimbingAssayPage(){
           <ol type="1" className="fs-6 fw-light" style={{marginLeft:"30px"}}>
               <li>Upload files in sets of six such that we have repeating sets of 1 labeled image followed by 5 images of trial runs.</li>
               <li>As many files can be included as one wishes. However, the current file system is prone to human error in ordering. Please keep this in mind.</li>
+              <li>Files must be in .JPG format.</li>
           </ol>
         <p className="fs-6 fw-light">
            Please reach out with any concerns about the tool to ashtondoane@gmail.com
@@ -102,7 +110,7 @@ function ClimbingAssayPage(){
       <div className="row">
         <div className="col-4"></div>
         <div className="col-8">
-        <Link to="../labelImages">
+        <Link to={validity?"../labelImages":""}>
           <Button fullWidth onClick={()=>{organizeToSets(images);}}>
             Submit
           </Button></Link>
